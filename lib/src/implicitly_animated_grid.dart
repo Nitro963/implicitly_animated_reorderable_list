@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'custom_sliver_animated_list.dart';
+import 'custom_sliver_animated_grid.dart';
 import 'src.dart';
 import 'util/types.dart';
 
 /// A Flutter ListView that implicitly animates between the changes of two lists.
-class ImplicitlyAnimatedList<E extends Object> extends StatelessWidget {
-  /// The current data that this [ImplicitlyAnimatedList] should represent.
+class ImplicitlyAnimatedGrid<E extends Object> extends StatelessWidget {
+  /// The current data that this [ImplicitlyAnimatedGrid] should represent.
   final List<E> items;
 
   /// Called, as needed, to build list item widgets.
@@ -16,7 +16,7 @@ class ImplicitlyAnimatedList<E extends Object> extends StatelessWidget {
 
   /// An optional builder when an item was removed from the list.
   ///
-  /// If not specified, the [ImplicitlyAnimatedList] uses the [itemBuilder] with
+  /// If not specified, the [ImplicitlyAnimatedGrid] uses the [itemBuilder] with
   /// the animation reversed.
   final RemovedItemBuilder<Widget, E>? removeItemBuilder;
 
@@ -120,13 +120,17 @@ class ImplicitlyAnimatedList<E extends Object> extends StatelessWidget {
   /// The amount of space by which to inset the children.
   final EdgeInsetsGeometry? padding;
 
+  /// A delegate that controls the layout of the children within the [GridView].
+  final SliverGridDelegate gridDelegate;
+
   /// Creates a Flutter ListView that implicitly animates between the changes
   /// of two lists.
-  const ImplicitlyAnimatedList({
+  const ImplicitlyAnimatedGrid({
     Key? key,
     required this.items,
     required this.itemBuilder,
     required this.areItemsTheSame,
+    required this.gridDelegate,
     this.removeItemBuilder,
     this.updateItemBuilder,
     this.insertDuration = const Duration(milliseconds: 500),
@@ -154,7 +158,7 @@ class ImplicitlyAnimatedList<E extends Object> extends StatelessWidget {
       slivers: <Widget>[
         SliverPadding(
           padding: padding ?? const EdgeInsets.all(0),
-          sliver: SliverImplicitlyAnimatedList<E>(
+          sliver: SliverImplicitlyAnimatedGrid<E>(
             items: items,
             itemBuilder: itemBuilder,
             areItemsTheSame: areItemsTheSame,
@@ -164,6 +168,7 @@ class ImplicitlyAnimatedList<E extends Object> extends StatelessWidget {
             removeDuration: removeDuration,
             updateDuration: updateDuration,
             spawnIsolate: spawnIsolate,
+            gridDelegate: gridDelegate,
           ),
         ),
       ],
@@ -172,7 +177,7 @@ class ImplicitlyAnimatedList<E extends Object> extends StatelessWidget {
 }
 
 /// A Flutter Sliver that implicitly animates between the changes of two lists.
-class SliverImplicitlyAnimatedList<E extends Object>
+class SliverImplicitlyAnimatedGrid<E extends Object>
     extends ImplicitlyAnimatedViewBase<Widget, E> {
   /// Creates a Flutter Sliver that implicitly animates between the changes of two lists.
   ///
@@ -196,11 +201,12 @@ class SliverImplicitlyAnimatedList<E extends Object>
   /// value as the MyersDiff implementation will use its own metrics to decide, whether
   /// a new isolate has to be spawned or not for optimal performance.
   /// {@endtemplate}
-  const SliverImplicitlyAnimatedList({
+  const SliverImplicitlyAnimatedGrid({
     Key? key,
     required List<E> items,
     required ImplicitlyAnimatedItemBuilder<Widget, E> itemBuilder,
     required ItemDiffUtil<E> areItemsTheSame,
+    required this.gridDelegate,
     RemovedItemBuilder<Widget, E>? removeItemBuilder,
     UpdatedItemBuilder<Widget, E>? updateItemBuilder,
     Duration insertDuration = const Duration(milliseconds: 500),
@@ -220,17 +226,20 @@ class SliverImplicitlyAnimatedList<E extends Object>
           spawnIsolate: spawnIsolate,
         );
 
+  /// A delegate that controls the layout of the children within the [GridView].
+  final SliverGridDelegate gridDelegate;
+
   @override
-  _SliverImplicitlyAnimatedListState<E> createState() =>
-      _SliverImplicitlyAnimatedListState<E>();
+  _SliverImplicitlyAnimatedGridState<E> createState() =>
+      _SliverImplicitlyAnimatedGridState<E>();
 }
 
-class _SliverImplicitlyAnimatedListState<E extends Object>
+class _SliverImplicitlyAnimatedGridState<E extends Object>
     extends ImplicitlyAnimatedViewBaseState<Widget,
-        SliverImplicitlyAnimatedList<E>, E, CustomSliverAnimatedList> {
+        SliverImplicitlyAnimatedGrid<E>, E, CustomSliverAnimatedGrid> {
   @override
   Widget build(BuildContext context) {
-    return CustomSliverAnimatedList(
+    return CustomSliverAnimatedGrid(
       key: animatedListKey,
       initialItemCount: newList.length,
       itemBuilder: (context, index, animation) {
@@ -247,6 +256,7 @@ class _SliverImplicitlyAnimatedListState<E extends Object>
           return itemBuilder(context, animation, item, index);
         }
       },
+      gridDelegate: widget.gridDelegate,
     );
   }
 }
