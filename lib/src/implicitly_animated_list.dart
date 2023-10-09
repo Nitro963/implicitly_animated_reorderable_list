@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:implicitly_animated_reorderable_list_2/src/custom_sliver_animated_list.dart';
 
+import 'custom_sliver_animated_list.dart';
 import 'src.dart';
+import 'util/types.dart';
 
 /// A Flutter ListView that implicitly animates between the changes of two lists.
 class ImplicitlyAnimatedList<E extends Object> extends StatelessWidget {
@@ -172,7 +173,7 @@ class ImplicitlyAnimatedList<E extends Object> extends StatelessWidget {
 
 /// A Flutter Sliver that implicitly animates between the changes of two lists.
 class SliverImplicitlyAnimatedList<E extends Object>
-    extends ImplicitlyAnimatedListBase<Widget, E> {
+    extends ImplicitlyAnimatedViewBase<Widget, E> {
   /// Creates a Flutter Sliver that implicitly animates between the changes of two lists.
   ///
   /// {@template implicitly_animated_reorderable_list_2.constructor}
@@ -225,8 +226,8 @@ class SliverImplicitlyAnimatedList<E extends Object>
 }
 
 class _SliverImplicitlyAnimatedListState<E extends Object>
-    extends ImplicitlyAnimatedListBaseState<Widget,
-        SliverImplicitlyAnimatedList<E>, E> {
+    extends ImplicitlyAnimatedViewBaseState<Widget,
+        SliverImplicitlyAnimatedList<E>, E, CustomSliverAnimatedList> {
   @override
   Widget build(BuildContext context) {
     return CustomSliverAnimatedList(
