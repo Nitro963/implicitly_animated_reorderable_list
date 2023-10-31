@@ -245,11 +245,11 @@ class _SliverImplicitlyAnimatedGridState<E extends Object>
       itemBuilder: (context, index, animation) {
         final E? item = data.getOrNull(index) ??
             newList.getOrNull(index) ??
-            oldList.getOrNull(index);
+            (useOldList ? oldList.getOrNull(index) : null);
         final didChange = changes[item] != null;
 
         if (item == null) {
-          return Container();
+          return const SizedBox.shrink();
         } else if (updateItemBuilder != null && didChange) {
           return buildUpdatedItemWidget(item);
         } else {

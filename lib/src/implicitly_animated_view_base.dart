@@ -165,18 +165,21 @@ abstract class ImplicitlyAnimatedViewBaseState<
     _calcDiffs();
   }
 
+  bool useOldList = false;
+
   Future<void> _calcDiffs() async {
     if (!mounted) return;
 
     // Don't check for too long lists the list equality as
     // this would begin to take longer than the diff
     // algorithm itself.
+    final diff = _oldItems.length - _newItems.length;
     final areListsShortEnoughForEqualityCheck =
         _oldItems.length < 100 && _newItems.length < 100;
     final areListsEqual =
         areListsShortEnoughForEqualityCheck && listEquals(_oldItems, _newItems);
-
-    if (!areListsEqual) {
+    useOldList = !areListsEqual && diff < 25 && _newItems.isNotEmpty;
+    if (useOldList) {
       _changes.clear();
 
       await _diffOperation?.cancel();
@@ -204,6 +207,7 @@ abstract class ImplicitlyAnimatedViewBaseState<
       // Always update the list with the newest data,
       // even if the lists have the same value equality.
       _data = List<E>.from(_newItems);
+      setState(() {});
     }
   }
 
